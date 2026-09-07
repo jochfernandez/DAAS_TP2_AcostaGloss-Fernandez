@@ -8,7 +8,8 @@
 ### Diagrama UML del enunciado visto en clase
 
 Trabajo Práctico en proceso de desarrollo, se puede actualizar el diagrama UML a medida que se avance en el desarrollo del proyecto.
-<img width="962" height="359" alt="DAAS_TP2" src="https://github.com/user-attachments/assets/ca0ff925-b833-449f-aca8-94049ce75633" />
+<img width="1371" height="544" alt="TP2" src="https://github.com/user-attachments/assets/3bffe03e-2ab6-4284-b404-ebd1e449dbc4" />
+
 
 ### Tecnologías utilizadas
 * Spring Boot
