@@ -5,6 +5,9 @@ import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ Esta es la clase CajaAhorro
+ */
 @Getter
 @Setter
 @Entity
