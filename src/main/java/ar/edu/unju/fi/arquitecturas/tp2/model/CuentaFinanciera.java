@@ -11,6 +11,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@Table(name="cuentas_financieras")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "tipo_cuenta", discriminatorType = DiscriminatorType.STRING)
 public abstract class CuentaFinanciera extends EntidadBase {

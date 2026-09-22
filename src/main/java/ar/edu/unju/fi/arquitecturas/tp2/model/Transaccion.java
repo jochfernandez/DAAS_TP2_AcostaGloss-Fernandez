@@ -15,6 +15,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Entity
+@Table(name="transacciones")
 public class Transaccion extends EntidadBase {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
