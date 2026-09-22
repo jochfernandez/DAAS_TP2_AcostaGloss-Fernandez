@@ -19,9 +19,11 @@ public abstract class CuentaFinanciera extends EntidadBase {
     @GeneratedValue(strategy = GenerationType.UUID)
     protected UUID id;
 
+    // TODO agregar longitud
     @Column(unique = true, nullable = false)
     protected String cbu;
 
+    // TODO agregar longitud para los alias
     @Column(unique = true, nullable = false)
     protected String alias;
 
