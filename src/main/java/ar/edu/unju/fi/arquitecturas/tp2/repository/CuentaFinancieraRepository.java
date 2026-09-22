@@ -12,6 +12,7 @@ import java.util.UUID;
 @Repository
 public interface CuentaFinancieraRepository extends JpaRepository<CuentaFinanciera, UUID> {
 
+
     Optional<CuentaFinanciera> findByCbu(String cbu);
 
     //Lista todas las cuentas según su estado (ej. buscar todas las "BLOQUEADAS")

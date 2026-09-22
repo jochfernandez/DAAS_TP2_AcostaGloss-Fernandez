@@ -11,6 +11,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
+/**
+ * TODO Documentar las clases
+ */
 @Getter
 @Setter
 @MappedSuperclass // Hereda estas columnas a las clases hijas
@@ -21,6 +24,7 @@ public abstract class EntidadBase {
     @Column(nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
 
+    // TODO Agregar name a las columnas
     @LastModifiedDate
     @Column(insertable = false)
     private LocalDateTime ultimaModificacion;
