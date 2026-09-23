@@ -3,8 +3,7 @@ package ar.edu.unju.fi.arquitecturas.tp2.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -16,6 +15,9 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
 @MappedSuperclass // Hereda estas columnas a las clases hijas
 @EntityListeners(AuditingEntityListener.class) // Activa el "escucha" que llena las fechas
 public abstract class EntidadBase {
