@@ -3,9 +3,11 @@ package ar.edu.unju.fi.arquitecturas.tp2.model;
 import ar.edu.unju.fi.arquitecturas.tp2.util.EstadoDeProcesamientoDeTransaccion;
 import ar.edu.unju.fi.arquitecturas.tp2.util.TipoDeTransaccion;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,6 +16,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@SuperBuilder
+@AllArgsConstructor
 @Entity
 @Table(name="transacciones")
 public class Transaccion extends EntidadBase {
