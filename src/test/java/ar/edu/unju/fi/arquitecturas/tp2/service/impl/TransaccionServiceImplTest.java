@@ -94,25 +94,25 @@ class TransaccionServiceImplTest {
 
     @Test
     void actualizarEstadoDeTransaccion_Exitoso() {
-        // Arrange: Simulamos que la transacción original estaba PENDIENTE
+        //Simulamos que la transacción original estaba PENDIENTE
         transaccionMock.setEstado(EstadoDeProcesamientoDeTransaccion.PENDIENTE);
         when(transaccionRepository.findById(idTransaccion)).thenReturn(Optional.of(transaccionMock));
         when(transaccionRepository.save(any(Transaccion.class))).thenReturn(transaccionMock);
 
-        // Act: Cambiamos el estado a RECHAZADA
+        //Cambiamos el estado a RECHAZADA
         Transaccion resultado = transaccionService.actualizarEstadoDeTransaccion(idTransaccion, EstadoDeProcesamientoDeTransaccion.RECHAZADA);
 
-        // Assert
+        // Verificamos que el estado se haya actualizado correctamente
         assertEquals(EstadoDeProcesamientoDeTransaccion.RECHAZADA, resultado.getEstado());
         verify(transaccionRepository, times(1)).save(transaccionMock);
     }
 
     @Test
     void actualizarEstadoDeTransaccion_LanzaExcepcion_SiNoExiste() {
-        // Arrange: Simulamos que la base de datos no encuentra el ID
+        //  Simulamos que la base de datos no encuentra el ID
         when(transaccionRepository.findById(idTransaccion)).thenReturn(Optional.empty());
 
-        // Act & Assert
+        // Verificamos que se lance la excepción correcta al intentar actualizar el estado de una transacción inexistente
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             transaccionService.actualizarEstadoDeTransaccion(idTransaccion, EstadoDeProcesamientoDeTransaccion.COMPLETADA);
         });
