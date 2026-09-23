@@ -1,10 +1,9 @@
 package ar.edu.unju.fi.arquitecturas.tp2.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +12,10 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@SuperBuilder
+@AllArgsConstructor
 @Entity
+@Table(name="clientes")
 public class Cliente extends EntidadBase{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -28,8 +30,10 @@ public class Cliente extends EntidadBase{
     private String telefono;
     @Column(nullable = false)
     private String direccion;
+    @Builder.Default
     @OneToMany(mappedBy = "titularPrincipal", cascade = CascadeType.ALL)
     private List<CuentaFinanciera> cuentas = new ArrayList<>();
+    @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "cliente_cotitular",
