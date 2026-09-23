@@ -44,31 +44,30 @@ class ClienteServiceImplTest {
 
     @Test
     void crearCliente_Exitoso() {
-        // Arrange: Simulamos que NO existe un cliente con ese CUIL/Mail
-        when(clienteRepository.existsByCuilOrMail(clienteMock.getCuil(), clienteMock.getMail())).thenReturn(false);
+        when(clienteRepository.existsById(idCliente)).thenReturn(false);
         when(clienteRepository.save(any(Cliente.class))).thenReturn(clienteMock);
 
-        // Act: Llamamos al método real del servicio
+        // Llamamos al métodoo real del servicio
         Cliente clienteCreado = clienteService.crearCliente(clienteMock);
 
-        // Assert: Verificamos los resultados
+        // Verificamos los resultados
         assertNotNull(clienteCreado);
         assertEquals("Ana Perez", clienteCreado.getNombre());
-        verify(clienteRepository, times(1)).save(clienteMock); // Verifica que se llamó al save
+        verify(clienteRepository, times(1)).save(clienteMock);
     }
 
     @Test
     void crearCliente_LanzaExcepcion_SiExisteDuplicado() {
-        // Arrange: Simulamos que YA existe un cliente
-        when(clienteRepository.existsByCuilOrMail(clienteMock.getCuil(), clienteMock.getMail())).thenReturn(true);
+        // Simulamos que ya existe un cliente con ese ID
+        when(clienteRepository.existsById(idCliente)).thenReturn(true);
 
-        // Act & Assert: Verificamos que lance la excepción exacta que definiste en el servicio
+        // Verificamos que lance la excepción exacta
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             clienteService.crearCliente(clienteMock);
         });
 
-        assertEquals("Ya existe un cliente registrado con el mismo CUIL o Email.", exception.getMessage());
-        verify(clienteRepository, never()).save(any(Cliente.class)); // Nunca debe llegar a guardar
+        assertEquals("Ya existe un cliente registrado con el mismo ID.", exception.getMessage());
+        verify(clienteRepository, never()).save(any(Cliente.class));
     }
 
     @Test
