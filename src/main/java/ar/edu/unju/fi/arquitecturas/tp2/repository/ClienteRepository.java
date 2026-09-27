@@ -38,6 +38,6 @@ public interface ClienteRepository extends JpaRepository<Cliente, UUID> {
      * @return
      */
     boolean  existsByCuilOrMail(String cuil, String mail);
-
+    boolean  existsByCuil(String cuil);
 
 }

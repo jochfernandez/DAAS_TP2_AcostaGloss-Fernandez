@@ -1,5 +1,6 @@
 package ar.edu.unju.fi.arquitecturas.tp2.service;
 
+import ar.edu.unju.fi.arquitecturas.tp2.dto.ClienteResponseDto;
 import ar.edu.unju.fi.arquitecturas.tp2.model.Cliente;
 
 import java.util.UUID;
