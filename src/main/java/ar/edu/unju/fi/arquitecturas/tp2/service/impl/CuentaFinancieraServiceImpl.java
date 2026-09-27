@@ -1,8 +1,14 @@
 package ar.edu.unju.fi.arquitecturas.tp2.service.impl;
 
+import ar.edu.unju.fi.arquitecturas.tp2.exception.RecursoNoEncontradoException;
+import ar.edu.unju.fi.arquitecturas.tp2.exception.SaldoInsuficienteException;
 import ar.edu.unju.fi.arquitecturas.tp2.model.CuentaFinanciera;
 import ar.edu.unju.fi.arquitecturas.tp2.repository.CuentaFinancieraRepository;
 import ar.edu.unju.fi.arquitecturas.tp2.service.CuentaFinancieraService;
+import ar.edu.unju.fi.arquitecturas.tp2.service.TransaccionService;
+import ar.edu.unju.fi.arquitecturas.tp2.util.EstadoDeProcesamientoDeTransaccion;
+import ar.edu.unju.fi.arquitecturas.tp2.util.TipoDeTransaccion;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +21,7 @@ import java.util.UUID;
 public class CuentaFinancieraServiceImpl implements CuentaFinancieraService {
 
     private final CuentaFinancieraRepository cuentaFinancieraRepository;
+    private final TransaccionService transaccionService;
 
     @Override
     public CuentaFinanciera buscarCuentaFinancieraPorId(UUID id) {
@@ -46,24 +53,33 @@ public class CuentaFinancieraServiceImpl implements CuentaFinancieraService {
         }
     }
 
+    @Transactional
     @Override
     public void transferir(UUID idCuentaOrigen, UUID idCuentaDestino, float monto) {
-        log.info("Iniciando transferencia de {} desde cuenta ID: {} hacia cuenta ID: {}", monto, idCuentaOrigen, idCuentaDestino);
-
-        CuentaFinanciera cuentaOrigen = buscarCuentaFinancieraPorId(idCuentaOrigen);
-        CuentaFinanciera cuentaDestino = buscarCuentaFinancieraPorId(idCuentaDestino);
-
-        if (cuentaOrigen.getSaldo() >= monto) {
-            cuentaOrigen.setSaldo(cuentaOrigen.getSaldo() - monto);
-            cuentaDestino.setSaldo(cuentaDestino.getSaldo() + monto);
-
-            cuentaFinancieraRepository.save(cuentaOrigen);
-            cuentaFinancieraRepository.save(cuentaDestino);
-            log.info("Transferencia completada exitosamente.");
-        } else {
-            log.warn("Transferencia denegada: Saldo insuficiente en cuenta origen ID: {}", idCuentaOrigen);
-            throw new IllegalArgumentException("Saldo insuficiente en la cuenta financiera de origen con el ID: " + idCuentaOrigen);
+        log.info("Iniciando solicitud de transferencia por monto: {}", monto);
+        CuentaFinanciera cuentaOrigen = cuentaFinancieraRepository.findById(idCuentaOrigen).orElseThrow(() -> {
+            log.error("Fallo en transferencia: Cuenta origen no encontrada (ID: {})", idCuentaOrigen);
+            return new RecursoNoEncontradoException("La cuenta de origen especificada no existe en el sistema.");
+        });
+        CuentaFinanciera cuentaDestino = cuentaFinancieraRepository.findById(idCuentaDestino).orElseThrow(() -> {
+            log.error("Fallo en transferencia: Cuenta destino no encontrada (ID: {})", idCuentaDestino);
+            return new RecursoNoEncontradoException("La cuenta de destino especificada no existe en el sistema.");
+        });
+        if (cuentaOrigen.getSaldo() < monto) {
+            log.warn("Transferencia denegada: Saldo insuficiente en cuenta origen asociada al CUIL: {}", cuentaOrigen.getTitularPrincipal().getCuil());
+            throw new SaldoInsuficienteException("Saldo insuficiente para realizar la transferencia.");
         }
+        // 1. Modificación de saldos
+        cuentaOrigen.setSaldo(cuentaOrigen.getSaldo() - monto);
+        cuentaDestino.setSaldo(cuentaDestino.getSaldo() + monto);
+        cuentaFinancieraRepository.save(cuentaOrigen);
+        cuentaFinancieraRepository.save(cuentaDestino);
+        // 2. Auditoría: Registro físico de la transacción (Débito y Crédito)
+        transaccionService.registrarTransaccion(cuentaOrigen, monto, TipoDeTransaccion.DEBITO, EstadoDeProcesamientoDeTransaccion.APROBADO);
+        transaccionService.registrarTransaccion(cuentaDestino, monto, TipoDeTransaccion.CREDITO, EstadoDeProcesamientoDeTransaccion.APROBADO);
+        log.info("Transferencia completada exitosamente entre CUIL origen: {} y CUIL destino: {}",
+                cuentaOrigen.getTitularPrincipal().getCuil(),
+                cuentaDestino.getTitularPrincipal().getCuil());
     }
 
     @Override

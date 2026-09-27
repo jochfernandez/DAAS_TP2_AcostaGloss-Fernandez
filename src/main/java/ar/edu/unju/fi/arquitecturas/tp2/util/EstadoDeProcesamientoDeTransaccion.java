@@ -4,7 +4,8 @@ public enum EstadoDeProcesamientoDeTransaccion {
     PENDIENTE("Pendiente"),
     COMPLETADA("Completada"),
     RECHAZADA("Rechazada"),
-    REVERTIDA("Revertida");
+    REVERTIDA("Revertida"),
+    APROBADO("Aprobado"),;
 
     private final String descripcion;
 

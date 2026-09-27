@@ -38,4 +38,26 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
+
+    // Captura cuenta no encontrada (Devuelve 404 Not Found)
+    @ExceptionHandler(RecursoNoEncontradoException.class)
+    public ResponseEntity<ErrorResponseDto> handleRecursoNoEncontrado(RecursoNoEncontradoException ex) {
+        ErrorResponseDto error = ErrorResponseDto.builder()
+                .mensaje(ex.getMessage())
+                .status(HttpStatus.NOT_FOUND.value())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    // Captura problemas de saldo (Devuelve 400 Bad Request o 409 Conflict)
+    @ExceptionHandler(SaldoInsuficienteException.class)
+    public ResponseEntity<ErrorResponseDto> handleSaldoInsuficiente(SaldoInsuficienteException ex) {
+        ErrorResponseDto error = ErrorResponseDto.builder()
+                .mensaje(ex.getMessage())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
 }
