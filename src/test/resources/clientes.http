@@ -1,0 +1,55 @@
+###
+POST http://localhost:8080/api/v1/clientes
+Content-Type: application/json
+
+{
+  "nombre": "Joaquín López",
+  "cuil": "20-35123456-7",
+  "mail": "joaquin.lopez@gmail.com",
+  "telefono": "388-4221133",
+  "direccion": "Belgrano 980, San Salvador de Jujuy"
+}
+### Prueba 1: Validaciones de campos vacíos y longitud (Debe dar 400 Bad Request)
+POST http://localhost:8080/api/v1/clientes
+Content-Type: application/json
+
+{
+  "nombre": "",
+  "cuil": "20",
+  "mail": "juan@example.com",
+  "telefono": "388-4221133",
+  "direccion": "Belgrano 980"
+}
+
+<> 2026-09-26T214349.400.json
+<> 2026-09-26T213444.400.json
+
+### Prueba 2: Formato de correo inválido (Debe dar 400 Bad Request)
+POST http://localhost:8080/api/v1/clientes
+Content-Type: application/json
+
+{
+  "nombre": "María Gómez",
+  "cuil": "27-35123456-7",
+  "mail": "correo-sin-arroba",
+  "telefono": "388-4221133",
+  "direccion": "San Martín 123"
+}
+
+<> 2026-09-26T213452.400.json
+
+### Prueba 3: Cliente duplicado - Regla de Negocio (Debe dar Error 500 o 400)
+# Usa el mismo CUIL de tu primera prueba exitosa para forzar la excepción del servicio
+POST http://localhost:8080/api/v1/clientes
+Content-Type: application/json
+
+{
+  "nombre": "Otro Joaquín",
+  "cuil": "20-35123456-7",
+  "mail": "nuevo.mail@example.com",
+  "telefono": "388-9999999",
+  "direccion": "Otra direccion"
+}
+<> 2026-09-26T213518.500.json
+<> 2026-09-26T213503.500.json
+<> 2026-09-26T213216.201.json

@@ -1,5 +1,6 @@
 package ar.edu.unju.fi.arquitecturas.tp2.service.impl;
 
+import ar.edu.unju.fi.arquitecturas.tp2.dto.ClienteResponseDto;
 import ar.edu.unju.fi.arquitecturas.tp2.model.Cliente;
 import ar.edu.unju.fi.arquitecturas.tp2.repository.ClienteRepository;
 import ar.edu.unju.fi.arquitecturas.tp2.service.ClienteService;
@@ -59,6 +60,7 @@ public class ClienteServiceImpl implements ClienteService {
         return clienteRepository.save(clienteExistente);
     }
 
+    // Verificar que un cotitular sólo sea vinculado a un cliente, un cotitular no puede pertenecer a mas de una lista de cliente.
     @Override
     public boolean vincularCotitular(UUID idCliente, UUID idCotitular) {
         Cliente cliente = buscarPorId(idCliente);
