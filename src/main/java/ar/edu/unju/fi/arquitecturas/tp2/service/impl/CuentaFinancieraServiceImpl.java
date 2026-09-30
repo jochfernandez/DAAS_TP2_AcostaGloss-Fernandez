@@ -1,11 +1,18 @@
 package ar.edu.unju.fi.arquitecturas.tp2.service.impl;
 
+import ar.edu.unju.fi.arquitecturas.tp2.dto.CuentaRequestDto;
+import ar.edu.unju.fi.arquitecturas.tp2.dto.CuentaResponseDto;
 import ar.edu.unju.fi.arquitecturas.tp2.exception.RecursoNoEncontradoException;
 import ar.edu.unju.fi.arquitecturas.tp2.exception.SaldoInsuficienteException;
+import ar.edu.unju.fi.arquitecturas.tp2.model.CajaAhorro;
+import ar.edu.unju.fi.arquitecturas.tp2.model.Cliente;
+import ar.edu.unju.fi.arquitecturas.tp2.model.CuentaCorriente;
 import ar.edu.unju.fi.arquitecturas.tp2.model.CuentaFinanciera;
 import ar.edu.unju.fi.arquitecturas.tp2.repository.CuentaFinancieraRepository;
+import ar.edu.unju.fi.arquitecturas.tp2.service.ClienteService;
 import ar.edu.unju.fi.arquitecturas.tp2.service.CuentaFinancieraService;
 import ar.edu.unju.fi.arquitecturas.tp2.service.TransaccionService;
+import ar.edu.unju.fi.arquitecturas.tp2.util.EstadoCuentaFinanciera;
 import ar.edu.unju.fi.arquitecturas.tp2.util.EstadoDeProcesamientoDeTransaccion;
 import ar.edu.unju.fi.arquitecturas.tp2.util.TipoDeTransaccion;
 import jakarta.transaction.Transactional;
@@ -13,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Slf4j
@@ -22,6 +30,49 @@ public class CuentaFinancieraServiceImpl implements CuentaFinancieraService {
 
     private final CuentaFinancieraRepository cuentaFinancieraRepository;
     private final TransaccionService transaccionService;
+    private final ClienteService clienteService;
+
+    @Override
+    public CuentaResponseDto crearCuenta(CuentaRequestDto cuentaRequestDto) {
+        log.info("Iniciando apertura de cuenta {} para titular ID: {}",
+                cuentaRequestDto.getTipoCuenta(), cuentaRequestDto.getTitularPrincipalId());
+        Cliente titular = clienteService.buscarPorId(cuentaRequestDto.getTitularPrincipalId());
+        CuentaFinanciera nuevaCuenta;
+        if ("CAJA_AHORRO".equalsIgnoreCase(cuentaRequestDto.getTipoCuenta())) {
+            CajaAhorro cajaAhorro = new CajaAhorro();
+            cajaAhorro.setTasaInteresAnual(30.0f);
+            cajaAhorro.setCupoLimite(3);
+            nuevaCuenta = cajaAhorro;
+        } else if ("CUENTA_CORRIENTE".equalsIgnoreCase(cuentaRequestDto.getTipoCuenta())) {
+            CuentaCorriente cuentaCorriente = new CuentaCorriente();
+            cuentaCorriente.setMargenDescubiertoAutorizado(50000f);
+            cuentaCorriente.setCostoDeComisionDeMantenimiento(1500f);
+            nuevaCuenta = cuentaCorriente;
+        } else {
+            throw new IllegalArgumentException("Tipo de cuenta inválido. Valores permitidos: CAJA_AHORRO o CUENTA_CORRIENTE.");
+        }
+
+        // 3. Setear propiedades comunes heredadas de la clase abstracta
+        nuevaCuenta.setTitularPrincipal(titular);
+        nuevaCuenta.setSaldo(cuentaRequestDto.getSaldoInicial());
+        // Usamos el Enum correspondiente a tu modelo
+        nuevaCuenta.setEstado(EstadoCuentaFinanciera.ACTIVA);
+        // Generación de identificadores bancarios simulados
+        nuevaCuenta.setCbu("285" + String.format("%019d", System.currentTimeMillis()));
+        nuevaCuenta.setAlias(titular.getNombre().split(" ")[0].toUpperCase() + "." + cuentaRequestDto.getTipoCuenta());
+        // 4. Guardar en BD
+        CuentaFinanciera cuentaGuardada = cuentaFinancieraRepository.save(nuevaCuenta);
+        log.info("Apertura exitosa. Nueva cuenta ID: {}", cuentaGuardada.getId());
+        // 5. Mapear a DTO de respuesta para proteger la entidad JPA
+        return CuentaResponseDto.builder()
+                .id(cuentaGuardada.getId())
+                .cbu(cuentaGuardada.getCbu())
+                .alias(cuentaGuardada.getAlias())
+                .tipoCuenta(cuentaRequestDto.getTipoCuenta().toUpperCase())
+                .saldo(cuentaGuardada.getSaldo())
+                .estado(cuentaGuardada.getEstado().name())
+                .build();
+    }
 
     @Override
     public CuentaFinanciera buscarCuentaFinancieraPorId(UUID id) {
