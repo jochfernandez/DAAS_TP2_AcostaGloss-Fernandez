@@ -1,5 +1,6 @@
 package ar.edu.unju.fi.arquitecturas.tp2.service.impl;
 
+import ar.edu.unju.fi.arquitecturas.tp2.exception.RecursoNoEncontradoException;
 import ar.edu.unju.fi.arquitecturas.tp2.model.CuentaFinanciera;
 import ar.edu.unju.fi.arquitecturas.tp2.model.Transaccion;
 import ar.edu.unju.fi.arquitecturas.tp2.repository.TransaccionRepository;
@@ -56,7 +57,7 @@ public class TransaccionServiceImpl implements TransaccionService {
         Transaccion transaccion = transaccionRepository.findById(idTransaccion)
                 .orElseThrow(() -> {
                     log.error("Fallo al actualizar: Transacción no encontrada con ID: {}", idTransaccion);
-                    return new IllegalArgumentException("Transacción no encontrada con el ID: " + idTransaccion);
+                    return new RecursoNoEncontradoException("Transacción no encontrada con el ID: " + idTransaccion);
                 });
 
         transaccion.setEstado(nuevoEstado);
