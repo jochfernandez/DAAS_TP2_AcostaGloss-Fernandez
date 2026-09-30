@@ -27,7 +27,7 @@ public class CuentaFinancieraServiceImpl implements CuentaFinancieraService {
     public CuentaFinanciera buscarCuentaFinancieraPorId(UUID id) {
         return cuentaFinancieraRepository.findById(id).orElseThrow(() -> {
             log.error("Cuenta financiera no encontrada con el ID: {}", id);
-            return new IllegalArgumentException("Cuenta financiera no encontrada con el ID: " + id);
+            return new RecursoNoEncontradoException("Cuenta financiera no encontrada con el ID: " + id);
         });
     }
 
@@ -49,7 +49,7 @@ public class CuentaFinancieraServiceImpl implements CuentaFinancieraService {
             return cuentaFinancieraRepository.save(cuenta);
         } else {
             log.warn("Extracción denegada: Saldo insuficiente ({}) para extraer {} en cuenta ID: {}", cuenta.getSaldo(), monto, id);
-            throw new IllegalArgumentException("Saldo insuficiente en la cuenta financiera con el ID: " + id);
+            throw new SaldoInsuficienteException("Saldo insuficiente en la cuenta financiera con el ID: " + id);
         }
     }
 
