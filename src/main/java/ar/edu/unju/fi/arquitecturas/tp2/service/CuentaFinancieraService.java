@@ -13,4 +13,5 @@ public interface CuentaFinancieraService {
     CuentaFinanciera extraer(UUID id, float monto);
     void transferir(UUID idCuentaOrigen, UUID idCuentaDestino, float monto);
     void aplicarInteresMensual(UUID id);
+    CuentaResponseDto consultarPorCbu(String cbu);
 }

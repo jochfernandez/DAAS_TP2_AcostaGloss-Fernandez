@@ -13,9 +13,9 @@ POST http://localhost:8080/api/v1/cuentas
 Content-Type: application/json
 
 {
-  "titularPrincipalId": "22222222-2222-2222-2222-222222222222",
+  "titularPrincipalId": "3b0a168d-eccb-4e12-8eaf-8cfa8ba4ef79",
   "tipoCuenta": "CUENTA_CORRIENTE",
-  "saldoInicial": 15000.50
+  "saldoInicial": 6700000000.50
 }
 
 ### 3. Error de Validación: Saldo Negativo (Debe dar 400 Bad Request)
@@ -49,3 +49,12 @@ Content-Type: application/json
   "tipoCuenta": "CUENTA_SUELDO",
   "saldoInicial": 0.00
 }
+### 6. Consulta Exitosa por CBU (Camino Feliz - 200 OK)
+# Consulta la caja de ahorro de Ana (ANA.AHORRO)
+GET http://localhost:8080/api/v1/cuentas/2850000001790805262953
+Accept: application/json
+
+### 7. Consulta Fallida: CBU Inexistente (Debe dar 404 Not Found)
+# Prueba que salte la RecursoNoEncontradoException
+GET http://localhost:8080/api/v1/cuentas/2850000000000000000000
+Accept: application/json

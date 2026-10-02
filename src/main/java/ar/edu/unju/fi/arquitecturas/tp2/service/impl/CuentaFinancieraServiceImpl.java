@@ -52,18 +52,13 @@ public class CuentaFinancieraServiceImpl implements CuentaFinancieraService {
             throw new IllegalArgumentException("Tipo de cuenta inválido. Valores permitidos: CAJA_AHORRO o CUENTA_CORRIENTE.");
         }
 
-        // 3. Setear propiedades comunes heredadas de la clase abstracta
         nuevaCuenta.setTitularPrincipal(titular);
         nuevaCuenta.setSaldo(cuentaRequestDto.getSaldoInicial());
-        // Usamos el Enum correspondiente a tu modelo
         nuevaCuenta.setEstado(EstadoCuentaFinanciera.ACTIVA);
-        // Generación de identificadores bancarios simulados
         nuevaCuenta.setCbu("285" + String.format("%019d", System.currentTimeMillis()));
         nuevaCuenta.setAlias(titular.getNombre().split(" ")[0].toUpperCase() + "." + cuentaRequestDto.getTipoCuenta());
-        // 4. Guardar en BD
         CuentaFinanciera cuentaGuardada = cuentaFinancieraRepository.save(nuevaCuenta);
         log.info("Apertura exitosa. Nueva cuenta ID: {}", cuentaGuardada.getId());
-        // 5. Mapear a DTO de respuesta para proteger la entidad JPA
         return CuentaResponseDto.builder()
                 .id(cuentaGuardada.getId())
                 .cbu(cuentaGuardada.getCbu())
@@ -103,7 +98,8 @@ public class CuentaFinancieraServiceImpl implements CuentaFinancieraService {
             throw new SaldoInsuficienteException("Saldo insuficiente en la cuenta financiera con el ID: " + id);
         }
     }
-
+    // TODO Documentar con JavaDoc
+    // TODO Implementar Swagger para la API de transferencia
     @Transactional
     @Override
     public void transferir(UUID idCuentaOrigen, UUID idCuentaDestino, float monto) {
@@ -120,12 +116,10 @@ public class CuentaFinancieraServiceImpl implements CuentaFinancieraService {
             log.warn("Transferencia denegada: Saldo insuficiente en cuenta origen asociada al CUIL: {}", cuentaOrigen.getTitularPrincipal().getCuil());
             throw new SaldoInsuficienteException("Saldo insuficiente para realizar la transferencia.");
         }
-        // 1. Modificación de saldos
         cuentaOrigen.setSaldo(cuentaOrigen.getSaldo() - monto);
         cuentaDestino.setSaldo(cuentaDestino.getSaldo() + monto);
         cuentaFinancieraRepository.save(cuentaOrigen);
         cuentaFinancieraRepository.save(cuentaDestino);
-        // 2. Auditoría: Registro físico de la transacción (Débito y Crédito)
         transaccionService.registrarTransaccion(cuentaOrigen, monto, TipoDeTransaccion.DEBITO, EstadoDeProcesamientoDeTransaccion.APROBADO);
         transaccionService.registrarTransaccion(cuentaDestino, monto, TipoDeTransaccion.CREDITO, EstadoDeProcesamientoDeTransaccion.APROBADO);
         log.info("Transferencia completada exitosamente entre CUIL origen: {} y CUIL destino: {}",
@@ -141,5 +135,26 @@ public class CuentaFinancieraServiceImpl implements CuentaFinancieraService {
         log.info("Aplicando interés mensual del 1% ({}) a cuenta ID: {}", interesMensual, id);
         cuenta.setSaldo(cuenta.getSaldo() + interesMensual);
         cuentaFinancieraRepository.save(cuenta);
+    }
+    @Override
+    public CuentaResponseDto consultarPorCbu(String cbu) {
+        log.info("Consultando detalles y saldo actual para la cuenta con CBU: {}", cbu);
+
+        CuentaFinanciera cuenta = cuentaFinancieraRepository.findByCbu(cbu)
+                .orElseThrow(() -> {
+                    log.error("Consulta fallida: No existe cuenta con el CBU: {}", cbu);
+                    return new RecursoNoEncontradoException("No se encontró ninguna cuenta asociada al CBU ingresado.");
+                });
+
+        String tipo = cuenta instanceof CajaAhorro ? "CAJA_AHORRO" : "CUENTA_CORRIENTE";
+
+        return CuentaResponseDto.builder()
+                .id(cuenta.getId())
+                .cbu(cuenta.getCbu())
+                .alias(cuenta.getAlias())
+                .tipoCuenta(tipo)
+                .saldo(cuenta.getSaldo())
+                .estado(cuenta.getEstado().name())
+                .build();
     }
 }

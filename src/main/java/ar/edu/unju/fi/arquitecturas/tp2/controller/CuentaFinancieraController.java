@@ -26,4 +26,10 @@ public class CuentaFinancieraController {
         // Se retorna estrictamente el DTO con el código HTTP 201 CREATED
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
+    @GetMapping("/{cbu}")
+    public ResponseEntity<CuentaResponseDto> consultarCuentaPorCbu(@PathVariable String cbu) {
+        CuentaResponseDto responseDto = cuentaFinancieraService.consultarPorCbu(cbu);
+
+        return ResponseEntity.ok(responseDto);
+    }
 }
