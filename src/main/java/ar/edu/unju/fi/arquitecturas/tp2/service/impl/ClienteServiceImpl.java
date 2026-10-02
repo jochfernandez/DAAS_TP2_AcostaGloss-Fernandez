@@ -18,6 +18,8 @@ public class ClienteServiceImpl implements ClienteService {
 
     private final ClienteRepository clienteRepository;
 
+    // Implementar Transactional
+
     @Override
     public Cliente crearCliente(Cliente cliente) {
         if(cliente.getId() != null && clienteRepository.existsById(cliente.getId())) {
