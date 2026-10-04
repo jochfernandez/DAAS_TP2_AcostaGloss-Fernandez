@@ -5,10 +5,13 @@ import ar.edu.unju.fi.arquitecturas.tp2.exception.RecursoNoEncontradoException;
 import ar.edu.unju.fi.arquitecturas.tp2.model.Cliente;
 import ar.edu.unju.fi.arquitecturas.tp2.repository.ClienteRepository;
 import ar.edu.unju.fi.arquitecturas.tp2.service.ClienteService;
+import ar.edu.unju.fi.arquitecturas.tp2.util.EstadoCliente;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Slf4j
@@ -18,15 +21,23 @@ public class ClienteServiceImpl implements ClienteService {
 
     private final ClienteRepository clienteRepository;
 
-    // Implementar Transactional
-
+    @Transactional
     @Override
     public Cliente crearCliente(Cliente cliente) {
+        if(clienteRepository.existsByCuilOrMail(cliente.getCuil(), cliente.getMail())) {
+            log.warn("Intento de creación fallido: Ya existe un cliente registrado con el mismo CUIL o Email.");
+            throw new IllegalArgumentException("Ya existe un cliente registrado con el mismo CUIL o Email.");
+        }
         if(cliente.getId() != null && clienteRepository.existsById(cliente.getId())) {
             log.warn("Intento de creación fallido: Ya existe un cliente registrado con el mismo ID: {}", cliente.getId());
             throw new IllegalArgumentException("Ya existe un cliente registrado con el mismo ID.");
         }
-        log.info("Creando nuevo cliente con CUIL: {}", cliente.getCuil());
+        log.info("Creando nuevo cliente con CUIL: {} en estado PENDIENTE_ACTIVACION", cliente.getCuil());
+        cliente.setEstado(EstadoCliente.PENDIENTE_ACTIVACION);
+        // 2. Generamos el Token de Activación (UUID)
+        cliente.setTokenActivacion(UUID.randomUUID().toString());
+        // 3. Validez estricta de 24 horas
+        cliente.setFechaExpiracionToken(LocalDateTime.now().plusHours(24));
         return clienteRepository.save(cliente);
     }
 

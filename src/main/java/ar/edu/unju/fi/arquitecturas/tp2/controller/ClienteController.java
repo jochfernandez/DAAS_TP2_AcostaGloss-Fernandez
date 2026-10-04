@@ -23,7 +23,11 @@ public class ClienteController {
     public ResponseEntity<ClienteResponseDto> registrarCliente(@Valid @RequestBody ClienteRequestDto requestDto) {
         Cliente nuevoCliente = clienteMapper.toEntity(requestDto);
         Cliente clienteGuardado = clienteService.crearCliente(nuevoCliente);
-        ClienteResponseDto responseDto = clienteMapper.toDto(clienteGuardado);
+
+        // Pasamos el mensaje personalizado al mapper
+        String mensaje = "Registro exitoso. La cuenta se encuentra pendiente de activación. Por favor, verifique su correo electrónico.";
+        ClienteResponseDto responseDto = clienteMapper.toDto(clienteGuardado, mensaje);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 }

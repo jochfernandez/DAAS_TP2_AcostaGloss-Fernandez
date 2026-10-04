@@ -17,5 +17,7 @@ public class ClienteResponseDto {
     private String mail;
     private String telefono;
     private String direccion;
+    private String estado;
+    private String mensaje;
     private LocalDateTime fechaCreacion;
 }

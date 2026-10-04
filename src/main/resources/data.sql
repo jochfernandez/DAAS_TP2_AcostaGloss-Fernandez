@@ -1,27 +1,26 @@
--- 1. Inserción de Clientes Titulares (es_titular = 1, titular_asociado_id = NULL)
+-- 1. Inserción de Clientes Titulares (es_titular = 1, titular_asociado_id = NULL, estado = 'ACTIVO')
 INSERT IGNORE INTO clientes
-(id, fecha_creacion, nombre, cuil, mail, telefono, direccion, es_titular, titular_asociado_id)
+(id, fecha_creacion, nombre, cuil, mail, telefono, direccion, es_titular, titular_asociado_id, estado, token_activacion, fecha_expiracion_token)
 VALUES
     (UUID_TO_BIN('11111111-1111-1111-1111-111111111111'), '2026-01-10 09:00:00',
-     'Ana Perez', '27-30111222-3', 'ana.perez@example.com', '388-4551001', 'Av. Belgrano 125, San Salvador de Jujuy', 1, NULL),
+     'Ana Perez', '27-30111222-3', 'ana.perez@example.com', '388-4551001', 'Av. Belgrano 125, San Salvador de Jujuy', 1, NULL, 'ACTIVO', NULL, NULL),
     (UUID_TO_BIN('22222222-2222-2222-2222-222222222222'), '2026-01-11 10:15:00',
-     'Bruno Gomez', '20-28444555-6', 'bruno.gomez@example.com', '388-4551002', 'Alvear 450, San Salvador de Jujuy', 1, NULL),
+     'Bruno Gomez', '20-28444555-6', 'bruno.gomez@example.com', '388-4551002', 'Alvear 450, San Salvador de Jujuy', 1, NULL, 'ACTIVO', NULL, NULL),
     (UUID_TO_BIN('33333333-3333-3333-3333-333333333333'), '2026-01-12 11:30:00',
-     'Carla Lopez', '27-32666777-8', 'carla.lopez@example.com', '388-4551003', 'Belgrano 980, San Salvador de Jujuy', 1, NULL),
+     'Carla Lopez', '27-32666777-8', 'carla.lopez@example.com', '388-4551003', 'Belgrano 980, San Salvador de Jujuy', 1, NULL, 'ACTIVO', NULL, NULL),
     (UUID_TO_BIN('44444444-4444-4444-4444-444444444444'), '2026-01-13 12:45:00',
-     'Diego Sosa', '20-31222333-5', 'diego.sosa@example.com', '388-4551004', 'Patricias Argentinas 210, Palpala', 1, NULL);
+     'Diego Sosa', '20-31222333-5', 'diego.sosa@example.com', '388-4551004', 'Patricias Argentinas 210, Palpala', 1, NULL, 'ACTIVO', NULL, NULL);
 
--- 2. Inserción de Clientes Adherentes (es_titular = 0, vinculados a los titulares de arriba)
+-- 2. Inserción de Clientes Adherentes (es_titular = 0, vinculados a titulares, estado = 'ACTIVO')
 INSERT IGNORE INTO clientes
-(id, fecha_creacion, nombre, cuil, mail, telefono, direccion, es_titular, titular_asociado_id)
+(id, fecha_creacion, nombre, cuil, mail, telefono, direccion, es_titular, titular_asociado_id, estado, token_activacion, fecha_expiracion_token)
 VALUES
     -- Adherente (hijo) vinculado a Ana Perez
     (UUID_TO_BIN('55555555-5555-5555-5555-555555555555'), '2026-01-14 09:00:00',
-     'Lucas Perez', '20-50111222-9', 'lucas.perez@example.com', '388-4551005', 'Av. Belgrano 125, San Salvador de Jujuy', 0, UUID_TO_BIN('11111111-1111-1111-1111-111111111111')),
+     'Lucas Perez', '20-50111222-9', 'lucas.perez@example.com', '388-4551005', 'Av. Belgrano 125, San Salvador de Jujuy', 0, UUID_TO_BIN('11111111-1111-1111-1111-111111111111'), 'ACTIVO', NULL, NULL),
     -- Adherente (cónyuge) vinculado a Bruno Gomez
     (UUID_TO_BIN('66666666-6666-6666-6666-666666666666'), '2026-01-14 10:15:00',
-     'Marta Gomez', '27-28444555-2', 'marta.gomez@example.com', '388-4551006', 'Alvear 450, San Salvador de Jujuy', 0, UUID_TO_BIN('22222222-2222-2222-2222-222222222222'));
-
+     'Marta Gomez', '27-28444555-2', 'marta.gomez@example.com', '388-4551006', 'Alvear 450, San Salvador de Jujuy', 0, UUID_TO_BIN('22222222-2222-2222-2222-222222222222'), 'ACTIVO', NULL, NULL);
 -- 3. Cuentas Financieras
 INSERT IGNORE INTO cuentas_financieras
 (id, fecha_creacion, cbu, alias, saldo, estado, titular_principal_id, tipo_cuenta,
