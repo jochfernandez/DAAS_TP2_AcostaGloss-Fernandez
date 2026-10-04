@@ -23,6 +23,7 @@ public class TransaccionController {
 
         // 1. Ejecutamos la lógica de negocio en la capa de Servicios
         cuentaFinancieraService.transferir(
+                requestDto.getIdCliente(),
                 requestDto.getIdCuentaOrigen(),
                 requestDto.getIdCuentaDestino(),
                 requestDto.getMonto()

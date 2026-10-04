@@ -60,4 +60,14 @@ public class GlobalExceptionHandler {
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
+    // Captura operaciones denegadas para Adherentes (Devuelve 403 Forbidden)
+    @ExceptionHandler(OperacionNoPermitidaException.class)
+    public ResponseEntity<ErrorResponseDto> handleOperacionNoPermitida(OperacionNoPermitidaException ex) {
+        ErrorResponseDto error = ErrorResponseDto.builder()
+                .mensaje(ex.getMessage())
+                .status(HttpStatus.FORBIDDEN.value())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
 }

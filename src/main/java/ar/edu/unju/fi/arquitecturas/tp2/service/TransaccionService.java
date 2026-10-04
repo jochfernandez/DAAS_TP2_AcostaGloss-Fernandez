@@ -13,5 +13,5 @@ public interface TransaccionService {
     List<Transaccion> listarTransaccionesPorId(UUID idCuenta);
     List<Transaccion> listarTransaccionesPorCuentaYTipo(UUID idCuenta, TipoDeTransaccion tipoDeTransaccion);
     Transaccion actualizarEstadoDeTransaccion(UUID idTransaccion, EstadoDeProcesamientoDeTransaccion nuevoEstado);
-
+    void validarPermisoOperacion(UUID idCliente, TipoDeTransaccion tipoDeTransaccion);
 }
