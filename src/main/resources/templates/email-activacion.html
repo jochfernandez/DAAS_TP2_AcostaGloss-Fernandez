@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activación de Cuenta - NEXO</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f5f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f4f5f5; padding: 40px 20px;">
+    <tr>
+        <td align="center">
+            <!-- Contenedor principal estilo ventana de aplicación -->
+            <table width="100%" max-width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border: 1px solid #dcdcdc; border-radius: 6px; overflow: hidden; max-width: 600px; width: 100%;">
+
+                <!-- Barra superior imitando la navegación -->
+                <tr>
+                    <td align="center" style="background-color: #f4f5f5; padding: 12px 20px; border-bottom: 1px solid #dcdcdc;">
+                        <span style="font-size: 14px; font-weight: 600; color: #555555; letter-spacing: 0.5px;">NEXO</span>
+                    </td>
+                </tr>
+
+                <!-- Cuerpo del mensaje -->
+                <tr>
+                    <td style="padding: 40px 40px 20px 40px; text-align: center;">
+                        <h2 style="margin: 0 0 20px 0; font-size: 22px; font-weight: 600; color: #111111;">¡Hola, {{NOMBRE}}!</h2>
+                        <p style="margin: 0 0 15px 0; font-size: 15px; line-height: 1.5; color: #333333;">
+                            Gracias por registrarte en NEXO. Tu cuenta está casi lista para ser utilizada.
+                        </p>
+                        <p style="margin: 0 0 35px 0; font-size: 15px; line-height: 1.5; color: #333333;">
+                            Para comenzar a operar, por favor activa tu cuenta haciendo clic en el botón de abajo. Por seguridad, este enlace es válido únicamente por <strong>24 horas</strong>.
+                        </p>
+
+                        <!-- Botón de acción con el azul vibrante característico -->
+                        <a href="{{ENLACE}}" style="display: inline-block; padding: 8px 24px; background-color: #007aff; color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none; border-radius: 5px; border: 1px solid #007aff;">Activar Mi Cuenta</a>
+                    </td>
+                </tr>
+
+                <!-- Pie de página con tipografía más pequeña y suave -->
+                <tr>
+                    <td style="padding: 20px 40px 40px 40px; text-align: center;">
+                        <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #888888;">
+                            Si el botón no funciona, copia y pega esta URL en tu navegador:<br>
+                            <a href="{{ENLACE}}" style="color: #007aff; text-decoration: none; word-break: break-all; margin-top: 5px; display: inline-block;">{{ENLACE}}</a>
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

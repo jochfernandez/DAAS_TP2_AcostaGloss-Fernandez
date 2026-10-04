@@ -1,6 +1,7 @@
 package ar.edu.unju.fi.arquitecturas.tp2.service.impl;
 
 import ar.edu.unju.fi.arquitecturas.tp2.dto.ClienteResponseDto;
+import ar.edu.unju.fi.arquitecturas.tp2.event.ClienteRegistradoEvent;
 import ar.edu.unju.fi.arquitecturas.tp2.exception.RecursoNoEncontradoException;
 import ar.edu.unju.fi.arquitecturas.tp2.model.Cliente;
 import ar.edu.unju.fi.arquitecturas.tp2.repository.ClienteRepository;
@@ -9,6 +10,7 @@ import ar.edu.unju.fi.arquitecturas.tp2.util.EstadoCliente;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,7 +20,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ClienteServiceImpl implements ClienteService {
-
+    private final ApplicationEventPublisher eventPublisher;
     private final ClienteRepository clienteRepository;
 
     @Transactional
@@ -38,7 +40,10 @@ public class ClienteServiceImpl implements ClienteService {
         cliente.setTokenActivacion(UUID.randomUUID().toString());
         // 3. Validez estricta de 24 horas
         cliente.setFechaExpiracionToken(LocalDateTime.now().plusHours(24));
-        return clienteRepository.save(cliente);
+        Cliente clienteGuardado = clienteRepository.save(cliente);
+        log.info("Publicando evento asíncrono para el envío de correo de bienvenida al cliente: {}", clienteGuardado.getMail());
+        eventPublisher.publishEvent(new ClienteRegistradoEvent(this, clienteGuardado));
+        return clienteGuardado;
     }
 
     @Override
