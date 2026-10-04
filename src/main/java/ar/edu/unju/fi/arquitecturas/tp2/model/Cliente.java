@@ -30,6 +30,17 @@ public class Cliente extends EntidadBase{
     private String telefono;
     @Column(nullable = false)
     private String direccion;
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean esTitular = true;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "titular_asociado_id")
+    private Cliente titularAsociado;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "titularAsociado", cascade = CascadeType.ALL)
+    private List<Cliente> adherentes = new ArrayList<>();
     @Builder.Default
     @OneToMany(mappedBy = "titularPrincipal", cascade = CascadeType.ALL)
     private List<CuentaFinanciera> cuentas = new ArrayList<>();

@@ -1,8 +1,11 @@
 package ar.edu.unju.fi.arquitecturas.tp2.service.impl;
 
+import ar.edu.unju.fi.arquitecturas.tp2.exception.OperacionNoPermitidaException;
 import ar.edu.unju.fi.arquitecturas.tp2.exception.RecursoNoEncontradoException;
+import ar.edu.unju.fi.arquitecturas.tp2.model.Cliente;
 import ar.edu.unju.fi.arquitecturas.tp2.model.CuentaFinanciera;
 import ar.edu.unju.fi.arquitecturas.tp2.model.Transaccion;
+import ar.edu.unju.fi.arquitecturas.tp2.repository.ClienteRepository;
 import ar.edu.unju.fi.arquitecturas.tp2.repository.TransaccionRepository;
 import ar.edu.unju.fi.arquitecturas.tp2.service.TransaccionService;
 import ar.edu.unju.fi.arquitecturas.tp2.util.EstadoDeProcesamientoDeTransaccion;
@@ -22,6 +25,7 @@ import java.util.UUID;
 public class TransaccionServiceImpl implements TransaccionService {
 
     private final TransaccionRepository transaccionRepository;
+    private final ClienteRepository clienteRepository;
 
     @Override
     public Transaccion registrarTransaccion(CuentaFinanciera cuenta, float monto, TipoDeTransaccion tipoDeTransaccion, EstadoDeProcesamientoDeTransaccion estadoDeProcesamientoDeTransaccion) {
@@ -62,5 +66,19 @@ public class TransaccionServiceImpl implements TransaccionService {
 
         transaccion.setEstado(nuevoEstado);
         return transaccionRepository.save(transaccion);
+    }
+
+    // TODO: Investigar si se puede hacer de forma diferente la condicion de si es adherente con un patron de diseno o algo similar, porque parece hardcodeado y no me gusta. Tal vez un patron de estrategia o algo asi.
+    @Override
+    public void validarPermisoOperacion(UUID idCliente, TipoDeTransaccion tipoDeTransaccion) {
+        Cliente cliente = clienteRepository.findById(idCliente)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Cliente no encontrado con ID: " + idCliente));
+
+        // Si el cliente es Adherente y la operación NO es una extracción, se bloquea.
+        if (Boolean.FALSE.equals(cliente.getEsTitular()) && tipoDeTransaccion != TipoDeTransaccion.EXTRACCION) {
+            log.warn("Operación bloqueada: El adherente ID {} intentó ejecutar una operación de tipo {}", idCliente, tipoDeTransaccion);
+            throw new OperacionNoPermitidaException("Los adherentes tienen restringida la operatividad exclusivamente a operaciones de Extracción.");
+        }
+        log.info("Validación superada: El cliente ID {} tiene permisos para la operación {}", idCliente, tipoDeTransaccion);
     }
 }

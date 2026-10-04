@@ -102,8 +102,9 @@ public class CuentaFinancieraServiceImpl implements CuentaFinancieraService {
     // TODO Implementar Swagger para la API de transferencia
     @Transactional
     @Override
-    public void transferir(UUID idCuentaOrigen, UUID idCuentaDestino, float monto) {
+    public void transferir(UUID idCliente, UUID idCuentaOrigen, UUID idCuentaDestino, float monto) {
         log.info("Iniciando solicitud de transferencia por monto: {}", monto);
+        transaccionService.validarPermisoOperacion(idCliente, TipoDeTransaccion.TRANSFERENCIA_ENVIADA);
         CuentaFinanciera cuentaOrigen = cuentaFinancieraRepository.findById(idCuentaOrigen).orElseThrow(() -> {
             log.error("Fallo en transferencia: Cuenta origen no encontrada (ID: {})", idCuentaOrigen);
             return new RecursoNoEncontradoException("La cuenta de origen especificada no existe en el sistema.");

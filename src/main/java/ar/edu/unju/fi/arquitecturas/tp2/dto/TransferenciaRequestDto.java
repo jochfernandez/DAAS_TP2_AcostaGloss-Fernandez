@@ -13,6 +13,9 @@ import java.util.UUID;
 @AllArgsConstructor
 public class TransferenciaRequestDto {
 
+    @NotNull(message = "El ID del cliente que realiza la transferencia es obligatorio.")
+    private UUID idCliente;
+
     @NotNull(message = "El ID de la cuenta de origen es obligatorio.")
     private UUID idCuentaOrigen;
 
