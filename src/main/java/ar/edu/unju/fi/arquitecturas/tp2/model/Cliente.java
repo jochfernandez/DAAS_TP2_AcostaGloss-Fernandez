@@ -1,10 +1,12 @@
 package ar.edu.unju.fi.arquitecturas.tp2.model;
 
+import ar.edu.unju.fi.arquitecturas.tp2.util.EstadoCliente;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.Builder;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -37,7 +39,15 @@ public class Cliente extends EntidadBase{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "titular_asociado_id")
     private Cliente titularAsociado;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private EstadoCliente estado = EstadoCliente.PENDIENTE_ACTIVACION;
+    @Column(name = "token_activacion", unique = true)
+    private String tokenActivacion;
 
+    @Column(name = "fecha_expiracion_token")
+    private LocalDateTime fechaExpiracionToken;
     @Builder.Default
     @OneToMany(mappedBy = "titularAsociado", cascade = CascadeType.ALL)
     private List<Cliente> adherentes = new ArrayList<>();
