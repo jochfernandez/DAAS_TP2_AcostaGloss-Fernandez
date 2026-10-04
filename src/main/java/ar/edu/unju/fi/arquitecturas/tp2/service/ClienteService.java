@@ -14,4 +14,5 @@ public interface ClienteService {
     Cliente eliminarCliente(UUID id);
     Cliente actualizarCliente(UUID id, Cliente cliente);
     boolean vincularCotitular(UUID idCliente, UUID idCotitular);
+    void activarCliente(String token);
 }

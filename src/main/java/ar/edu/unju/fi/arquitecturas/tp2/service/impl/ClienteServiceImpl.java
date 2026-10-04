@@ -95,4 +95,31 @@ public class ClienteServiceImpl implements ClienteService {
         clienteRepository.save(cliente);
         return true;
     }
+
+    @Override
+    public void activarCliente(String token) {
+        Cliente cliente = clienteRepository.findByTokenActivacion(token)
+                .orElseThrow(() -> {
+                    log.error("Activación fallida: Token de activación inválido o no encontrado: {}", token);
+                    return new RecursoNoEncontradoException("Token de activación inválido o no encontrado.");
+                });
+
+        if(cliente.getEstado() == EstadoCliente.ACTIVO) {
+            log.warn("Intento de activación fallido: Cliente ID: {} ya está activo", cliente.getId());
+            throw new IllegalStateException("El cliente ya está activo.");
+        }
+
+        if(cliente.getFechaExpiracionToken().isBefore(LocalDateTime.now())) {
+            log.warn("Intento de activación fallido: Token de activación para el cliente ID: {} ha expirado", cliente.getId());
+            throw new IllegalStateException("El token de activación ha expirado.");
+        }
+
+        log.info("Activando cliente ID: {} con token de activación válido", cliente.getId());
+        cliente.setEstado(EstadoCliente.ACTIVO);
+        cliente.setTokenActivacion(null); // Limpiamos el token después de la activación
+        cliente.setFechaExpiracionToken(null); // Limpiamos la fecha de expiración
+        clienteRepository.save(cliente);
+        log.info("Cliente ID: {} activado exitosamente", cliente.getId());
+
+    }
 }
