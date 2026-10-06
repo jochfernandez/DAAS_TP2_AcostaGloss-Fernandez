@@ -70,4 +70,15 @@ public class GlobalExceptionHandler {
                 .build();
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
+
+    // Captura tope diario excedido (Devuelve 422 Unprocessable Entity)
+    @ExceptionHandler(TopeDiarioExcedidoException.class)
+    public ResponseEntity<ErrorResponseDto> handleTopeDiarioExcedido(TopeDiarioExcedidoException ex) {
+        ErrorResponseDto error = ErrorResponseDto.builder()
+                .mensaje(ex.getMessage())
+                .status(HttpStatus.UNPROCESSABLE_ENTITY.value())
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
+    }
 }

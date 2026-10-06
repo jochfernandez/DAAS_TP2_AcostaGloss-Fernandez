@@ -6,7 +6,8 @@ public enum TipoDeTransaccion {
     TRANSFERENCIA_ENVIADA("Transferencia enviada"),
     TRANSFERENCIA_RECIBIDA("Transferencia recibida"),
     DEBITO("Débito"),
-    CREDITO("Crédito");
+    CREDITO("Crédito"),
+    DEBITO_COMISION("Débito Comisión");
 
     private final String descripcion;
 

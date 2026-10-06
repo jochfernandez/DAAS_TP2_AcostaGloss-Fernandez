@@ -1,5 +1,7 @@
 package ar.edu.unju.fi.arquitecturas.tp2.service;
 
+import ar.edu.unju.fi.arquitecturas.tp2.dto.ExtraccionRequestDto;
+import ar.edu.unju.fi.arquitecturas.tp2.dto.TransaccionResponseDto;
 import ar.edu.unju.fi.arquitecturas.tp2.model.CuentaFinanciera;
 import ar.edu.unju.fi.arquitecturas.tp2.model.Transaccion;
 import ar.edu.unju.fi.arquitecturas.tp2.util.EstadoDeProcesamientoDeTransaccion;
@@ -14,4 +16,5 @@ public interface TransaccionService {
     List<Transaccion> listarTransaccionesPorCuentaYTipo(UUID idCuenta, TipoDeTransaccion tipoDeTransaccion);
     Transaccion actualizarEstadoDeTransaccion(UUID idTransaccion, EstadoDeProcesamientoDeTransaccion nuevoEstado);
     void validarPermisoOperacion(UUID idCliente, TipoDeTransaccion tipoDeTransaccion);
+    TransaccionResponseDto realizarExtraccion(ExtraccionRequestDto dto);
 }
