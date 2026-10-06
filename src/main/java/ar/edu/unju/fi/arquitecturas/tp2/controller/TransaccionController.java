@@ -1,8 +1,11 @@
 package ar.edu.unju.fi.arquitecturas.tp2.controller;
 
+import ar.edu.unju.fi.arquitecturas.tp2.dto.ExtraccionRequestDto;
+import ar.edu.unju.fi.arquitecturas.tp2.dto.TransaccionResponseDto;
 import ar.edu.unju.fi.arquitecturas.tp2.dto.TransferenciaRequestDto;
 import ar.edu.unju.fi.arquitecturas.tp2.dto.TransferenciaResponseDto;
 import ar.edu.unju.fi.arquitecturas.tp2.service.CuentaFinancieraService;
+import ar.edu.unju.fi.arquitecturas.tp2.service.TransaccionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,7 @@ public class TransaccionController {
 
     // Inyectamos el servicio que contiene tu lógica con @Transactional
     private final CuentaFinancieraService cuentaFinancieraService;
+    private final TransaccionService transaccionService;
 
     @PostMapping("/transferir")
     public ResponseEntity<TransferenciaResponseDto> realizarTransferencia(@Valid @RequestBody TransferenciaRequestDto requestDto) {
@@ -37,6 +41,13 @@ public class TransaccionController {
                 .build();
 
         // 3. Retornamos con estado HTTP 200 OK (ResponseEntity.ok)
+        return ResponseEntity.ok(responseDto);
+    }
+
+
+    @PostMapping("/extraccion")
+    public ResponseEntity<TransaccionResponseDto> realizarExtraccion(@Valid @RequestBody ExtraccionRequestDto requestDto) {
+        TransaccionResponseDto responseDto = transaccionService.realizarExtraccion(requestDto);
         return ResponseEntity.ok(responseDto);
     }
 }

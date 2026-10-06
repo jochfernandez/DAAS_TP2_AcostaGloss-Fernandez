@@ -1,21 +1,30 @@
 package ar.edu.unju.fi.arquitecturas.tp2.service.impl;
 
+import ar.edu.unju.fi.arquitecturas.tp2.dto.ExtraccionRequestDto;
+import ar.edu.unju.fi.arquitecturas.tp2.dto.TransaccionResponseDto;
 import ar.edu.unju.fi.arquitecturas.tp2.exception.OperacionNoPermitidaException;
 import ar.edu.unju.fi.arquitecturas.tp2.exception.RecursoNoEncontradoException;
+import ar.edu.unju.fi.arquitecturas.tp2.exception.SaldoInsuficienteException;
+import ar.edu.unju.fi.arquitecturas.tp2.exception.TopeDiarioExcedidoException;
 import ar.edu.unju.fi.arquitecturas.tp2.model.Cliente;
 import ar.edu.unju.fi.arquitecturas.tp2.model.CuentaFinanciera;
+import ar.edu.unju.fi.arquitecturas.tp2.model.ParametroGlobal;
 import ar.edu.unju.fi.arquitecturas.tp2.model.Transaccion;
 import ar.edu.unju.fi.arquitecturas.tp2.repository.ClienteRepository;
+import ar.edu.unju.fi.arquitecturas.tp2.repository.CuentaFinancieraRepository;
+import ar.edu.unju.fi.arquitecturas.tp2.repository.ParametroGlobalRepository;
 import ar.edu.unju.fi.arquitecturas.tp2.repository.TransaccionRepository;
 import ar.edu.unju.fi.arquitecturas.tp2.service.TransaccionService;
 import ar.edu.unju.fi.arquitecturas.tp2.util.EstadoDeProcesamientoDeTransaccion;
 import ar.edu.unju.fi.arquitecturas.tp2.util.TipoDeTransaccion;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,6 +35,46 @@ public class TransaccionServiceImpl implements TransaccionService {
 
     private final TransaccionRepository transaccionRepository;
     private final ClienteRepository clienteRepository;
+    private final ParametroGlobalRepository parametroGlobalRepository;
+    private final CuentaFinancieraRepository cuentaFinancieraRepository;
+
+    @Override
+    @Transactional
+    public TransaccionResponseDto realizarExtraccion(ExtraccionRequestDto dto) {
+        log.info("Iniciando solicitud de extracción por monto: {}", dto.getMonto());
+        validarPermisoOperacion(dto.getIdCliente(), TipoDeTransaccion.EXTRACCION);
+
+        CuentaFinanciera cuenta = cuentaFinancieraRepository.findById(dto.getIdCuenta()).orElseThrow(() -> {
+            log.error("Fallo en extracción: Cuenta no encontrada (ID: {})", dto.getIdCuenta());
+            return new RecursoNoEncontradoException("La cuenta especificada no existe en el sistema.");
+        });
+
+        if (cuenta.getSaldo() < dto.getMonto()) {
+            log.warn("Extracción denegada: Saldo insuficiente en cuenta asociada al CUIL: {}", cuenta.getTitularPrincipal().getCuil());
+            throw new SaldoInsuficienteException("Saldo insuficiente para realizar la extracción.");
+        }
+
+        ParametroGlobal param = parametroGlobalRepository.findById("LIMITE_DIARIO_TITULAR")
+                .orElse(null);
+        if (param != null) {
+            LocalDateTime startOfDay = LocalDateTime.now().with(LocalTime.MIN);
+            LocalDateTime endOfDay = LocalDateTime.now().with(LocalTime.MAX);
+            float acumuladoHoy = transaccionRepository.sumMontoByClienteAndTipoAndFecha(dto.getIdCliente(), TipoDeTransaccion.EXTRACCION, startOfDay, endOfDay);
+            if (acumuladoHoy + dto.getMonto() > param.getValor()) {
+                throw new TopeDiarioExcedidoException("El monto solicitado supera el límite diario de extracción.");
+            }
+        }
+
+        cuenta.setSaldo(cuenta.getSaldo() - dto.getMonto());
+        cuentaFinancieraRepository.save(cuenta);
+        registrarTransaccion(cuenta, dto.getMonto(), TipoDeTransaccion.EXTRACCION, EstadoDeProcesamientoDeTransaccion.APROBADO);
+
+        return TransaccionResponseDto.builder()
+                .mensaje("Extracción realizada con éxito.")
+                .monto(dto.getMonto())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
 
     @Override
     public Transaccion registrarTransaccion(CuentaFinanciera cuenta, float monto, TipoDeTransaccion tipoDeTransaccion, EstadoDeProcesamientoDeTransaccion estadoDeProcesamientoDeTransaccion) {
